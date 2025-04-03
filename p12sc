@@ -1,0 +1,40 @@
+import socket
+import threading
+
+def run_server():
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind(("localhost", 12346))
+    server_socket.listen(1)
+    
+    print("Server waiting for connection...")
+    conn, addr = server_socket.accept()
+    print(f"Connected by {addr}")
+
+    data = conn.recv(1024).decode()
+    print("Client:", data)
+
+    conn.send("Hello from Server!".encode())  # Send response to client
+
+    conn.close()
+    server_socket.close()
+
+# Start server in a new thread
+server_thread = threading.Thread(target=run_server)
+server_thread.start()
+
+
+
+import socket
+
+# Client code to send message to server
+def run_client():
+    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    client_socket.connect(("localhost", 12346))  # Connect to server
+
+    client_socket.send("Hello from Client!".encode())  # Send message to server
+    print("Server:", client_socket.recv(1024).decode())  # Receive server response
+
+    client_socket.close()
+
+# Run the client
+run_client()
