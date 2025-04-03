@@ -1,0 +1,74 @@
+import numpy as np
+import pandas as pd
+import random
+import matplotlib.pyplot as plt
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+
+class FacultyData:
+    def __init__(self, num_samples=100):
+        self.num_samples = num_samples
+        self.df = self.generate_data()
+
+    def generate_data(self):
+        faculty_data = []
+
+        for i in range(self.num_samples):
+            name = f"Faculty{i+1}"
+            faculty_id = f"ID{i+1:03d}"
+            experience = random.randint(1, 35)
+            age = experience + random.randint(25, 30)
+            gender = random.choice(["Male", "Female"])
+            publications = random.randint(1, 50)
+            patents = max(0, random.randint(0, publications // 2))
+
+            if experience <= 10:
+                designation = "Assistant Professor"
+                designation_factor = 3
+                salary = random.randint(40000, 65000)
+            elif 10 < experience <= 17:
+                designation = "Associate Professor"
+                designation_factor = 2
+                salary = random.randint(67000, 100000)
+            else:
+                designation = "Professor"
+                designation_factor = 1
+                salary = random.randint(105000, 145000)
+
+            faculty_data.append([name, faculty_id, experience, age, gender, publications, patents, designation, designation_factor, salary])
+
+        df = pd.DataFrame(faculty_data, columns=["Name", "ID", "Experience", "Age", "Gender", "Publications", "Patents", "Designation", "Designation_Factor", "Salary"])
+        return df
+
+    def design_ann(self):
+        X = self.df[["Age", "Publications", "Patents"]]
+        y = self.df["Designation_Factor"]
+
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+        model = Sequential([
+            Dense(10, activation="relu", input_shape=(3,)),
+            Dense(8, activation="relu"),
+            Dense(4, activation="relu"),
+            Dense(1, activation="linear")
+        ])
+
+        model.compile(optimizer="adam", loss="mse", metrics=["mae"])
+        model.fit(X_train, y_train, epochs=50, batch_size=10, verbose=1)
+
+        loss, mae = model.evaluate(X_test, y_test)
+        print(f"Test Mean Absolute Error: {mae}")
+
+        predictions = model.predict(X_test)
+
+        plt.scatter(y_test, predictions, color="blue")
+        plt.xlabel("Actual Designation Factor")
+        plt.ylabel("Predicted Designation Factor")
+        plt.title("ANN Prediction: Designation Factor")
+        plt.show()
+
+faculty = FacultyData(num_samples=100)
+faculty.design_ann()
+print(faculty.df.head())
