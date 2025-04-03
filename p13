@@ -1,0 +1,40 @@
+import threading
+
+def addition(a, b):
+    print(f"Addition of {a} and {b}: {a + b}")
+
+def subtraction(a, b):
+    print(f"Subtraction of {a} and {b}: {a - b}")
+
+def multiplication(a, b):
+    print(f"Multiplication of {a} and {b}: {a * b}")
+
+def division(a, b):
+    if b != 0:
+        print(f"Division of {a} by {b}: {a / b}")
+    else:
+        print("Division by zero is not allowed")
+
+if __name__ == "__main__":
+    a = float(input("Enter the first number: "))
+    b = float(input("Enter the second number: "))
+    
+    # Creating threads for each arithmetic operation
+    thread1 = threading.Thread(target=addition, args=(a, b))
+    thread2 = threading.Thread(target=subtraction, args=(a, b))
+    thread3 = threading.Thread(target=multiplication, args=(a, b))
+    thread4 = threading.Thread(target=division, args=(a, b))
+    
+    # Starting threads
+    thread1.start()
+    thread2.start()
+    thread3.start()
+    thread4.start()
+    
+    # Waiting for all threads to complete
+    thread1.join()
+    thread2.join()
+    thread3.join()
+    thread4.join()
+    
+    print("All operations completed.")
