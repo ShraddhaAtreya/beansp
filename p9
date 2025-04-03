@@ -1,0 +1,85 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import random
+
+# ----------------------------
+# Generate Synthetic Faculty Data
+# ----------------------------
+def generate_data(n=100):
+    names = [f"Faculty_{i}" for i in range(n)]
+    ids = [f"ID{i:03d}" for i in range(n)]
+    experience = np.random.randint(1, 35, n)
+    departments = ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL']
+    designations = ['Assistant Professor', 'Associate Professor', 'Professor']
+    salaries = np.random.randint(40000, 150000, n)
+    genders = random.choices(['Male', 'Female'], k=n)
+    publications = np.random.randint(0, 30, n)
+    patents = np.random.randint(0, 10, n)
+    ages = np.random.randint(28, 65, n)
+
+    data = {
+        'Name': names,
+        'ID': ids,
+        'Experience': experience,
+        'Dept': random.choices(departments, k=n),
+        'Designation': random.choices(designations, k=n),
+        'Salary': salaries,
+        'Gender': genders,
+        'Publications': publications,
+        'Patents': patents,
+        'Age': ages
+    }
+
+    return pd.DataFrame(data)
+
+# ----------------------------
+# Create Data
+# ----------------------------
+df = generate_data(100)
+
+# ----------------------------
+# a) Pie chart for designations
+# ----------------------------
+designation_counts = df['Designation'].value_counts()
+plt.figure(figsize=(6,6))
+plt.pie(designation_counts, labels=designation_counts.index, autopct='%1.1f%%', startangle=140)
+plt.title("Distribution of Designations")
+plt.show()
+
+# ----------------------------
+# b) Histogram for CSE faculty by designation
+# ----------------------------
+cse_df = df[df['Dept'] == 'CSE']
+plt.figure(figsize=(6,4))
+plt.hist(cse_df['Designation'], bins=np.arange(4)-0.5, edgecolor='black', rwidth=0.7)
+plt.xticks(ticks=[0,1,2], labels=['Assistant Professor', 'Associate Professor', 'Professor'], rotation=20)
+plt.title("CSE Dept - Faculty Designation Histogram")
+plt.xlabel("Designation")
+plt.ylabel("Count")
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.show()
+
+# ----------------------------
+# c) Bar chart for number of faculty in each dept
+# ----------------------------
+dept_counts = df['Dept'].value_counts()
+plt.figure(figsize=(6,4))
+plt.bar(dept_counts.index, dept_counts.values, color='skyblue')
+plt.title("Number of Faculty in Each Department")
+plt.xlabel("Department")
+plt.ylabel("Faculty Count")
+plt.grid(True, axis='y', linestyle='--', alpha=0.5)
+plt.show()
+
+# ----------------------------
+# d) Line graph for average age of faculty in each dept
+# ----------------------------
+avg_age = df.groupby('Dept')['Age'].mean()
+plt.figure(figsize=(6,4))
+plt.plot(avg_age.index, avg_age.values, marker='o', linestyle='-', color='green')
+plt.title("Average Age of Faculty in Each Department")
+plt.xlabel("Department")
+plt.ylabel("Average Age")
+plt.grid(True, linestyle='--', alpha=0.5)
+plt.show()
