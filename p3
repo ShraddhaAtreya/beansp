@@ -1,0 +1,72 @@
+import numpy as np
+import random
+import pandas as pd
+from sklearn.linear_model import LinearRegression
+
+# Function to generate faculty data using dictionaries
+def generate_faculty_data(num_samples=100):
+    faculty_data = []
+    
+    for i in range(num_samples):
+        name = f"Faculty{i+1}"
+        faculty_id = f"ID{i+1:03d}"
+        experience = random.randint(1, 35)
+        gender = random.choice(['male', 'female'])
+        publications = random.randint(1, 50)
+        patents = max(0, random.randint(0, publications // 2))
+
+        # Assign designation and salary based on experience
+        if experience <= 10:
+            designation = "Assistant Professor"
+            designation_factor = 3
+            salary = random.randint(40000, 65000)
+        elif 11 <= experience <= 17:
+            designation = "Associate Professor"
+            designation_factor = 2
+            salary = random.randint(67000, 100000)
+        else:
+            designation = "Professor"
+            designation_factor = 1
+            salary = random.randint(105000, 145000)
+
+        # Store data in a dictionary
+        faculty_data.append({
+            'name': name,
+            'faculty_id': faculty_id,
+            'experience': experience,
+            'gender': gender,
+            'publications': publications,
+            'patents': patents,
+            'designation': designation,
+            'designation_factor': designation_factor,
+            'salary': salary
+        })
+    
+    return faculty_data
+
+# Generate data
+faculty_list = generate_faculty_data(100)
+
+# Convert to DataFrame
+df = pd.DataFrame(faculty_list)
+
+# Perform regression analysis
+
+# Predict salary using designation factor
+X_salary = df[['designation_factor']]
+y_salary = df['salary']
+salary_model = LinearRegression()
+salary_model.fit(X_salary, y_salary)
+df['predicted_salary'] = salary_model.predict(X_salary)
+
+# Predict patents using publications
+X_patents = df[['publications']]
+y_patents = df['patents']
+patents_model = LinearRegression()
+patents_model.fit(X_patents, y_patents)
+df['predicted_patents'] = patents_model.predict(X_patents)
+
+# Display results
+print("\nSample Dataset:\n", df.head())
+print("\nSalary Prediction Coefficients:", salary_model.coef_)
+print("\nPatents Prediction Coefficients:", patents_model.coef_)
