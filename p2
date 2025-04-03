@@ -1,0 +1,44 @@
+import pandas as pd
+import numpy as np
+import random
+
+# Generate Synthetic Faculty Data using Tuples
+def generate_faculty_data(num_samples=100):
+    faculty_data = []
+
+    for i in range(num_samples):
+        name = f"Faculty_{i+1}"
+        faculty_id = f"ID{i+1:03d}"
+        experience = random.randint(1, 35)
+        gender = random.choice(["Male", "Female"])
+        publications = random.randint(0, 30)
+        patents = max(0, random.randint(0, publications // 2))  # Patents depend on publications
+
+        # Assign designation based on experience
+        if experience < 10:
+            designation = "Asst"
+            designation_factor = 3
+            salary = random.randint(40000, 60000)
+        elif 10 <= experience < 20:
+            designation = "Asso"
+            designation_factor = 2
+            salary = random.randint(70000, 100000)
+        else:
+            designation = "Prof"
+            designation_factor = 1
+            salary = random.randint(110000, 150000)
+
+        faculty_data.append((name, faculty_id, experience, designation, salary, gender, publications, patents, designation_factor))
+
+    return faculty_data
+
+# Convert tuple data to DataFrame
+faculty_tuples = generate_faculty_data(100)
+df = pd.DataFrame(faculty_tuples, columns=["Name", "ID", "Experience", "Designation", "Salary", "Gender", "Publications", "Patents", "Designation_Factor"])
+
+# Find Correlation between Designation, Salary, Experience, Publications, and Patents
+correlation_matrix = df[["Designation_Factor", "Salary", "Experience", "Publications", "Patents"]].corr()
+
+# Display Data and Correlation Matrix
+print("\nSample Faculty Data:\n", df.head())
+print("\nCorrelation Matrix:\n", correlation_matrix)
