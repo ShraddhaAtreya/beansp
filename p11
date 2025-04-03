@@ -1,0 +1,29 @@
+from PIL import Image
+
+def main():
+    # a) Read image name and open it
+    image_path = input("Enter image path: ")
+    img = Image.open(image_path)
+    
+    # b) Get image info
+    print(f"Format: {img.format}, Mode: {img.mode}, Size: {img.size}")
+    
+    # c) Rotate image
+    angle = float(input("Enter rotation angle: "))
+    img = img.rotate(angle, expand=True)
+    
+    # d) Resize image
+    width = int(input("Enter new width: "))
+    height = int(input("Enter new height: "))
+    img = img.resize((width, height))
+    
+    # e) Save image with explicit error handling
+    try:
+        new_path = input("Enter new image filename: ")
+        img.save(new_path)
+        print(f"Image successfully saved as {new_path}")
+    except Exception as e:
+        print(f"Error saving image: {e}")
+        
+if __name__ == "__main__":
+    main()
