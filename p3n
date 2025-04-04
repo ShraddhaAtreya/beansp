@@ -1,0 +1,94 @@
+import numpy as np
+import random
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+
+# Function to generate faculty data
+def generate_faculty_data(num_samples=100):
+    faculty_data = []
+    
+    for i in range(num_samples):
+        name = f"Faculty{i+1}"
+        faculty_id = f"ID{i+1:03d}"
+        experience = random.randint(1, 35)
+        gender = random.choice(['Male', 'Female'])
+        publications = random.randint(1, 50)
+        patents = max(0, random.randint(0, publications // 2))
+
+        if experience <= 10:
+            designation = "Assistant Professor"
+            designation_factor = 3
+            salary = random.randint(40000, 65000)
+        elif 11 <= experience <= 17:
+            designation = "Associate Professor"
+            designation_factor = 2
+            salary = random.randint(67000, 100000)
+        else:
+            designation = "Professor"
+            designation_factor = 1
+            salary = random.randint(105000, 145000)
+
+        faculty_data.append({
+            "name": name,
+            "faculty_id": faculty_id,
+            "experience": experience,
+            "gender": gender,
+            "publications": publications,
+            "patents": patents,
+            "designation": designation,
+            "designation_factor": designation_factor,
+            "salary": salary
+        })
+    
+    return faculty_data
+
+# Generate faculty dataset
+faculty_list = generate_faculty_data(100)
+df = pd.DataFrame(faculty_list)
+
+# Display Sample Data
+print("\n Sample Dataset: \n", df.head())
+
+# Correlation Matrix
+correlation_matrix = df[['designation_factor', 'salary', 'experience', 'publications', 'patents']].corr()
+print("\n Correlation Matrix: \n", correlation_matrix)
+
+# ============================ Regression Model 1: Predict Salary ============================
+X_salary = df[['designation_factor']]  # Features
+y_salary = df['salary']  # Target
+
+salary_model = LinearRegression()
+salary_model.fit(X_salary, y_salary)
+
+df['predicted_salary'] = salary_model.predict(X_salary)
+# Visualizing Salary Prediction
+plt.figure(figsize=(8,5))
+sns.scatterplot(x=df['experience'], y=df['salary'], color='blue', label="Actual Salary")
+sns.scatterplot(x=df['experience'], y=df['predicted_salary'], color='red', label="Predicted Salary")
+plt.xlabel("Experience (Years)")
+plt.ylabel("Salary")
+plt.title("Actual vs Predicted Salary")
+plt.legend()
+plt.show()
+
+
+# ============================ Regression Model 2: Predict Patents ============================
+X_patents = df[['publications']]  # Feature
+y_patents = df['patents']  # Target
+
+patents_model = LinearRegression()
+patents_model.fit(X_patents, y_patents)
+
+df['predicted_patents'] = patents_model.predict(X_patents)
+
+# Visualizing Patents Prediction
+plt.figure(figsize=(8,5))
+sns.scatterplot(x=df['publications'], y=df['patents'], color='green', label="Actual Patents")
+sns.scatterplot(x=df['publications'], y=df['predicted_patents'], color='orange', label="Predicted Patents")
+plt.xlabel("Publications")
+plt.ylabel("Patents")
+plt.title("Actual vs Predicted Patents")
+plt.legend()
+plt.show()
