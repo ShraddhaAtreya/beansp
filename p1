@@ -1,0 +1,162 @@
+import pandas as pd
+import numpy as np
+import random
+import csv
+
+# Define departments, ranks, and genders
+departments = ["Computer Science", "Mathematics", "Physics", "Chemistry", "Biology", "History", "English", "Economics"]
+ranks = ["Assistant Professor", "Associate Professor", "Professor"]
+genders = ["Male", "Female"]
+
+# Function to generate faculty name
+def generate_name(i):
+    return f"faculty_{i+1}"
+
+# Function to determine years of experience
+def get_experience(rank):
+    if rank == "Assistant Professor":
+        return random.randint(1, 5)
+    elif rank == "Associate Professor":
+        return random.randint(6, 10)
+    else:
+        return random.randint(11, 25)
+
+# Function to determine salary
+def get_salary(rank, experience):
+    if rank == "Assistant Professor":
+        return 50000 + (experience * 1000)
+    elif rank == "Associate Professor":
+        return 70000 + (experience * 1500)
+    else:
+        return 100000 + (experience * 2000)
+
+# Function to determine publications
+def get_publications(rank):
+    if rank == "Assistant Professor":
+        return random.randint(1, 5)
+    elif rank == "Associate Professor":
+        return random.randint(6, 10)
+    else:
+        return random.randint(11, 30)
+
+# Function to determine patents
+def get_patents(rank, publications):
+    if rank == "Assistant Professor":
+        return random.randint(0, int(publications * 0.2))
+    elif rank == "Associate Professor":
+        return random.randint(2, int(publications * 0.4))
+    else:
+        return random.randint(5, int(publications * 0.6))
+
+# Generate faculty data
+def generate_faculty_data(num_rows):
+    data = []
+    for i in range(num_rows):
+        faculty_id = str(i + 1)  # Ensure faculty_id is a string
+        name = generate_name(i)
+        department = random.choice(departments)
+        rank = random.choice(ranks)
+        gender = random.choice(genders)
+        experience = get_experience(rank)
+        salary = get_salary(rank, experience)
+        publications = get_publications(rank)
+        patents = get_patents(rank, publications)
+        data.append([faculty_id, name, department, rank, gender, experience, salary, publications, patents])
+    return data
+
+# Number of rows to generate
+num_rows = 100000
+faculty_data = generate_faculty_data(num_rows)
+
+# Write to CSV
+csv_filename = "faculty_data.csv"
+with open(csv_filename, mode='w', newline='') as file:
+    writer = csv.writer(file)
+    writer.writerow(["faculty_id", "name", "department", "rank", "gender", "years_of_experience", "salary", "publications", "patents"])
+    writer.writerows(faculty_data)
+
+print(f"Dataset with {num_rows} rows written to {csv_filename}")
+
+# Load data into a list
+faculty_list = []
+with open(csv_filename, mode='r') as file:
+    reader = csv.reader(file)
+    header = next(reader)
+    for row in reader:
+        faculty_list.append(row)
+
+# Menu-driven operations
+def menu():
+    while True:
+        print("\nMenu:")
+        print("1. Add Faculty")
+        print("2. Search Faculty by ID")
+        print("3. Delete Faculty by ID")
+        print("4. Display Faculty Eligible for BOS")
+        print("5. Exit")
+        choice = input("Enter choice: ")
+        
+        if choice == '1':
+            add_faculty()
+        elif choice == '2':
+            search_faculty()
+        elif choice == '3':
+            delete_faculty()
+        elif choice == '4':
+            check_bos_eligibility()
+        elif choice == '5':
+            break
+        else:
+            print("Invalid choice. Try again.")
+
+# Add a new faculty record
+def add_faculty():
+    faculty_id = input("Enter faculty ID: ")
+    name = input("Enter faculty name: ")
+    department = input("Enter department: ")
+    rank = input("Enter rank: ")
+    gender = input("Enter gender: ")
+    experience = int(input("Enter years of experience: "))
+    salary = get_salary(rank, experience)
+    publications = get_publications(rank)
+    patents = get_patents(rank, publications)
+    faculty_list.append([faculty_id, name, department, rank, gender, experience, salary, publications, patents])
+    print("Faculty added successfully.")
+
+# Search faculty by ID
+def search_faculty():
+    search_id = input("Enter Faculty ID to search: ")
+    for faculty in faculty_list:
+        if faculty[0] == search_id:
+            print("Faculty Found:", faculty)
+            return
+    print("Faculty not found.")
+
+# Delete faculty by ID
+def delete_faculty():
+    delete_id = input("Enter Faculty ID to delete: ")
+    for i, faculty in enumerate(faculty_list):
+        if faculty[0] == delete_id:
+            del faculty_list[i]
+            print("Faculty deleted successfully.")
+            return
+    print("Faculty not found.")
+
+# Check BOS eligibility
+def check_bos_eligibility():
+   try:
+       experience = int(input("Enter faculty experience (years): "))
+       name = input("Enter faculty name: ")
+       
+       print(f"\nFaculty Name: {name}")
+       print(f"Experience: {experience} years")
+       
+       if experience > 10:
+           print("Eligibility: Eligible to participate in BOS")
+       else:
+           print("Eligibility: Not eligible for BOS (requires > 10 years of experience)")
+   except ValueError:
+       print("Invalid input. Please enter a numeric value for experience.")
+
+# Start the menu
+menu()
