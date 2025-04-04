@@ -1,0 +1,72 @@
+import numpy as np
+import pandas as pd
+import random
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LogisticRegression
+
+class FacultyData:
+    def __init__(self, num_samples=100):
+        self.num_samples = num_samples
+        self.df = self.generate_data()
+
+    def generate_data(self):
+        faculty_data = []
+
+        for i in range(self.num_samples):
+            name = f"Faculty{i+1}"
+            faculty_id = f"ID{i+1:03d}"
+            experience = random.randint(1, 35)
+            age = experience + random.randint(25, 30)
+            gender = random.choice(["Male", "Female"])
+            publications = random.randint(1, 50)
+            patents = max(0, random.randint(0, publications // 2))
+
+            if experience <= 10:
+                designation, designation_factor = "Assistant Professor", 3
+                salary = random.randint(40000, 65000)
+            elif 10 < experience <= 17:
+                designation, designation_factor = "Associate Professor", 2
+                salary = random.randint(67000, 100000)
+            else:
+                designation, designation_factor = "Professor", 1
+                salary = random.randint(105000, 145000)
+
+            faculty_data.append([name, faculty_id, experience, age, gender, publications, patents, designation, designation_factor, salary])
+
+        df = pd.DataFrame(faculty_data, columns=["Name", "ID", "Experience", "Age", "Gender", "Publications", "Patents", "Designation", "Designation_Factor", "Salary"])
+        return df
+
+    def logistic_regression(self, predictor):
+        X = self.df[[predictor]]
+        y = self.df["Designation_Factor"]
+
+        model = LogisticRegression(multi_class='multinomial', solver='lbfgs', max_iter=500)
+        model.fit(X, y)
+
+        print(f"\nLogistic Regression on {predictor}:")
+        print(f"Coefficients: {model.coef_}")
+        print(f"Intercept: {model.intercept_}")
+
+        X_range = np.linspace(X.min(), X.max(), 100).reshape(-1, 1)
+        probabilities = model.predict_proba(X_range)
+
+        plt.figure(figsize=(8, 5))
+        plt.scatter(X, y, color='blue', label='Actual Data')
+        labels = ["Prof", "Asso", "Asst"]
+ 
+        for i in range(3):  # 0, 1, 2
+            plt.plot(X_range, probabilities[:, i], label=f"Prob({labels[i]})")
+
+        plt.xlabel(predictor)
+        plt.ylabel("Probability of Designation")
+        plt.title(f"Logistic Regression: {predictor} vs Designation")
+        plt.legend()
+        plt.show()
+
+# Generate data and perform regression
+faculty = FacultyData(num_samples=100)
+faculty.logistic_regression("Experience")
+faculty.logistic_regression("Age")
+
+# Display the first few rows of the generated data
+print(faculty.df.head())
